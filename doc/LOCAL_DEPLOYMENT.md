@@ -55,6 +55,8 @@ This guide covers deploying mobile-use on your local machine or home server for 
 
 This is the easiest method for home servers and ensures all dependencies are included.
 
+> **💡 TIP**: We provide a special `docker-compose.local-server.yml` configuration optimized for home server deployment with auto-restart, resource limits, and persistent volumes. Use this instead of the standard `docker-compose.yml` for 24/7 operation.
+
 #### 1. Clone the Repository
 
 ```bash
@@ -145,13 +147,33 @@ adb connect <DEVICE_IP>:5555
 
 #### 5. Run Mobile-Use
 
-**For USB connection:**
+**For Home Server (Recommended - with auto-restart and persistence):**
+
+```bash
+# Set device IP in environment (or add to .env file)
+export ADB_CONNECT_ADDR="192.168.1.100:5555"
+
+# Run as one-off command
+docker-compose -f docker-compose.local-server.yml run --rm mobile-use \
+  "Check my email and summarize any important messages"
+
+# OR run as persistent background service
+docker-compose -f docker-compose.local-server.yml up -d mobile-use
+
+# View logs
+docker-compose -f docker-compose.local-server.yml logs -f mobile-use
+
+# Stop service
+docker-compose -f docker-compose.local-server.yml down
+```
+
+**For USB connection (standard):**
 ```bash
 docker-compose run --rm mobile-use-full-usb \
   "Check my email and summarize any important messages"
 ```
 
-**For wireless/IP connection:**
+**For wireless/IP connection (standard):**
 ```bash
 # Set device IP in environment
 export ADB_CONNECT_ADDR="192.168.1.100:5555"

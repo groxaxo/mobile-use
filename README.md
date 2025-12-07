@@ -206,6 +206,24 @@ This guide covers:
 - Running as a background service
 - Troubleshooting common issues
 
+**Quick Start for Home Servers:**
+
+```bash
+# Use the optimized docker-compose configuration
+export ADB_CONNECT_ADDR="192.168.1.100:5555"  # Your device IP
+docker-compose -f docker-compose.local-server.yml run --rm mobile-use "Your command here"
+
+# Or run as a persistent service
+docker-compose -f docker-compose.local-server.yml up -d mobile-use
+```
+
+The `docker-compose.local-server.yml` file is pre-configured for home server deployment with:
+- ✅ Persistent volumes for data and configuration
+- ✅ Auto-restart on failure
+- ✅ Resource limits to prevent overuse
+- ✅ Optional integrated Ollama for local LLMs
+- ✅ Optimized for 24/7 operation
+
 ### Manual Launch (Development Mode)
 
 For developers who want to set up the environment manually:
@@ -336,6 +354,30 @@ We love contributions! Whether you're fixing a bug, adding a feature, or improvi
     <img src="https://api.star-history.com/svg?repos=minitap-ai/mobile-use&type=Date" alt="Star History Chart" />
   </a>
 </p>
+
+## 🔐 Privacy & Security
+
+Mobile-use is designed with privacy as a core principle:
+
+- **🏠 Local by Default**: All processing happens on your machine/server
+- **🔒 No Telemetry**: Zero tracking or analytics sent to external services
+- **🌐 Network Control**: You choose what data (if any) leaves your network
+- **🛡️ Open Source**: Fully auditable code - see exactly what runs on your system
+
+**Local LLM Options for Complete Privacy:**
+- [Ollama](https://ollama.ai/) - Easy local LLM deployment
+- [LM Studio](https://lmstudio.ai/) - GUI for local models
+- [LocalAI](https://localai.io/) - OpenAI-compatible local server
+- Any OpenAI-compatible endpoint
+
+See the [Local Deployment Guide](doc/LOCAL_DEPLOYMENT.md) for setup instructions.
+
+## 📖 Documentation
+
+- 📘 [Local & Home Server Deployment](doc/LOCAL_DEPLOYMENT.md) - Complete guide for local/home server setup
+- 📗 [Wireless Setup Guide](doc/WIRELESS_SETUP.md) - Configure wireless device mirroring
+- 📙 [Official Documentation](https://docs.minitap.ai/v2/mcp-server/introduction) - Full API and SDK docs
+- 📕 [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
 
 ## 📜 License
 
