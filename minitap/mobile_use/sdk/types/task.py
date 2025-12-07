@@ -94,10 +94,12 @@ class TaskRequest[TOutput](TaskRequestCommon):
         output_format: Optional pydantic model for the output format of the task
         max_steps: Maximum number of steps the agent can take (default: 20)
         record_trace: Whether to record a trace (screenshots, actions) of the execution
-                      (default: False)
+                      locally (default: False)
         trace_path: Directory path to save trace data if recording is enabled
         llm_output_path: Path to save LLM output data
         thoughts_output_path: Path to save thoughts output data
+        enable_remote_tracing: Whether to send usage data to the Minitap platform
+                               (default: False - no telemetry)
     """
 
     goal: str
@@ -105,6 +107,7 @@ class TaskRequest[TOutput](TaskRequestCommon):
     task_name: str | None = None
     output_description: str | None = None
     output_format: type[TOutput] | None = None
+    # Remote tracing is disabled by default - no telemetry is sent unless explicitly enabled
     enable_remote_tracing: bool = False
 
 

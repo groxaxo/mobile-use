@@ -120,7 +120,7 @@ class PlatformService:
                     max_steps=400,
                     goal=request.task.goal,
                     output_description=request.task.output_description,
-                    enable_remote_tracing=True,
+                    enable_remote_tracing=False,
                     profile=profile.name,
                     # Local configuration
                     record_trace=request.record_trace,
