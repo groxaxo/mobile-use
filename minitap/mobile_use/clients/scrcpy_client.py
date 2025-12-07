@@ -29,7 +29,7 @@ except ImportError:
 class ScrcpyClientWrapper:
     """
     Wrapper for scrcpy client to provide screen mirroring capabilities.
-    
+
     This wrapper enables wireless screen mirroring with better performance
     compared to traditional ADB screenshot methods.
     """
@@ -95,7 +95,7 @@ class ScrcpyClientWrapper:
 
             # Start the client
             self._client.start(threaded=True)
-            
+
             # Wait for first frame
             max_wait = 5  # seconds
             start_time = time.time()

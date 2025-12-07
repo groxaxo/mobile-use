@@ -32,7 +32,7 @@ pytestmark = pytest.mark.skipif(
 def adb_device():
     """
     Get first available ADB device for testing.
-    
+
     Requires an Android device or emulator to be connected.
     """
     try:
@@ -49,20 +49,20 @@ def adb_device():
 def scrcpy_client_wrapper(adb_device):
     """
     Create a ScrcpyClientWrapper instance for testing.
-    
+
     This fixture automatically starts and stops the scrcpy client.
     """
     from minitap.mobile_use.clients.scrcpy_client import ScrcpyClientWrapper
-    
+
     client = ScrcpyClientWrapper(
         device=adb_device,
         max_width=800,  # Use lower resolution for tests
         max_fps=30,     # Lower FPS for tests
     )
-    
+
     # Don't start automatically - let tests control when to start
     yield client
-    
+
     # Cleanup
     if client.is_started():
         client.stop()
@@ -72,7 +72,7 @@ def scrcpy_client_wrapper(adb_device):
 def test_scrcpy_client_import():
     """Test that scrcpy client can be imported."""
     from minitap.mobile_use.clients.scrcpy_client import ScrcpyClientWrapper, SCRCPY_AVAILABLE
-    
+
     assert SCRCPY_AVAILABLE, "scrcpy should be available for these tests"
     assert ScrcpyClientWrapper is not None
 
@@ -81,7 +81,7 @@ def test_scrcpy_client_import():
 def test_scrcpy_client_initialization(adb_device):
     """Test scrcpy client can be initialized."""
     from minitap.mobile_use.clients.scrcpy_client import ScrcpyClientWrapper
-    
+
     client = ScrcpyClientWrapper(device=adb_device)
     assert client is not None
     assert client.device == adb_device
@@ -92,11 +92,11 @@ def test_scrcpy_client_initialization(adb_device):
 def test_scrcpy_client_start_stop(scrcpy_client_wrapper):
     """Test scrcpy client can be started and stopped."""
     client = scrcpy_client_wrapper
-    
+
     # Test start
     assert client.start(), "Client should start successfully"
     assert client.is_started(), "Client should be marked as started"
-    
+
     # Test stop
     client.stop()
     assert not client.is_started(), "Client should be marked as stopped"
@@ -106,23 +106,23 @@ def test_scrcpy_client_start_stop(scrcpy_client_wrapper):
 def test_scrcpy_screenshot(scrcpy_client_wrapper):
     """Test scrcpy can capture screenshots."""
     import base64
-    
+
     client = scrcpy_client_wrapper
-    
+
     # Start client
     assert client.start(), "Client should start successfully"
-    
+
     # Give scrcpy time to receive frames
     import time
     time.sleep(2)
-    
+
     # Capture screenshot
     screenshot_b64 = client.get_screenshot_base64()
-    
+
     # Verify screenshot
     assert screenshot_b64 is not None, "Screenshot should not be None"
     assert len(screenshot_b64) > 0, "Screenshot should have data"
-    
+
     # Verify it's valid base64
     try:
         base64.b64decode(screenshot_b64)
@@ -134,17 +134,17 @@ def test_scrcpy_screenshot(scrcpy_client_wrapper):
 def test_scrcpy_get_resolution(scrcpy_client_wrapper):
     """Test scrcpy can retrieve device resolution."""
     client = scrcpy_client_wrapper
-    
+
     # Start client
     assert client.start(), "Client should start successfully"
-    
+
     # Give scrcpy time to initialize
     import time
     time.sleep(2)
-    
+
     # Get resolution
     width, height = client.get_resolution()
-    
+
     # Verify resolution
     assert width > 0, "Width should be greater than 0"
     assert height > 0, "Height should be greater than 0"
@@ -156,17 +156,17 @@ def test_scrcpy_get_resolution(scrcpy_client_wrapper):
 def test_scrcpy_pil_image(scrcpy_client_wrapper):
     """Test scrcpy can return PIL Image."""
     client = scrcpy_client_wrapper
-    
+
     # Start client
     assert client.start(), "Client should start successfully"
-    
+
     # Give scrcpy time to receive frames
     import time
     time.sleep(2)
-    
+
     # Get PIL image
     image = client.get_screenshot_pil()
-    
+
     # Verify image
     assert image is not None, "Image should not be None"
     assert image.width > 0, "Image width should be greater than 0"
@@ -177,7 +177,7 @@ def test_scrcpy_pil_image(scrcpy_client_wrapper):
 def test_scrcpy_error_handling_no_start(scrcpy_client_wrapper):
     """Test error handling when getting screenshot without starting."""
     client = scrcpy_client_wrapper
-    
+
     # Try to get screenshot without starting
     with pytest.raises(RuntimeError):
         client.get_screenshot_base64()
@@ -187,13 +187,13 @@ def test_scrcpy_error_handling_no_start(scrcpy_client_wrapper):
 def test_scrcpy_multiple_screenshots(scrcpy_client_wrapper):
     """Test scrcpy can capture multiple screenshots."""
     import time
-    
+
     client = scrcpy_client_wrapper
-    
+
     # Start client
     assert client.start(), "Client should start successfully"
     time.sleep(2)
-    
+
     # Capture multiple screenshots
     screenshots = []
     for _ in range(3):
@@ -202,6 +202,6 @@ def test_scrcpy_multiple_screenshots(scrcpy_client_wrapper):
         assert len(screenshot) > 0
         screenshots.append(screenshot)
         time.sleep(0.5)
-    
+
     # Verify we got different screenshots (frames should update)
     assert len(set(screenshots)) >= 1, "Should have captured frames"

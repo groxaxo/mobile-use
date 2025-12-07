@@ -269,7 +269,7 @@ print(f"Scrcpy available: {SCRCPY_AVAILABLE}")
 if SCRCPY_AVAILABLE:
     device = adb.device_list()[0]
     client = ScrcpyClientWrapper(device=device)
-    
+
     if client.start():
         print("✓ Scrcpy started successfully")
         width, height = client.get_resolution()
@@ -344,7 +344,7 @@ else:
 
 - [scrcpy GitHub](https://github.com/Genymobile/scrcpy)
 - [scrcpy Documentation](https://github.com/Genymobile/scrcpy/tree/master/doc)
-- [py-scrcpy-client](https://github.com/leng-yue/py-scrcpy-client)
+- [scrcpy-client Python Library](https://github.com/leng-yue/py-scrcpy-client)
 - [ADB Wireless Documentation](https://developer.android.com/studio/command-line/adb#wireless)
 
 ## Support

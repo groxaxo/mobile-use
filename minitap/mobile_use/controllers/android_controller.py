@@ -45,11 +45,11 @@ class AndroidDeviceController(MobileDeviceController):
         self.device_width = device_width
         self.device_height = device_height
         self._device: AdbDevice | None = None
-        
+
         # Scrcpy support
         self.use_scrcpy = use_scrcpy and SCRCPY_AVAILABLE
         self.scrcpy_client: Optional[ScrcpyClientWrapper] = None
-        
+
         if self.use_scrcpy:
             if not SCRCPY_AVAILABLE:
                 logger.warning("Scrcpy requested but not available, falling back to UIAutomator2")
@@ -119,15 +119,15 @@ class AndroidDeviceController(MobileDeviceController):
                 logger.info("Using scrcpy for screen data retrieval")
                 # Get screenshot from scrcpy
                 screenshot_base64 = self.scrcpy_client.get_screenshot_base64()
-                
+
                 # Get UI hierarchy from UIAutomator2 (scrcpy doesn't provide this)
                 ui_data = self.ui_adb_client.get_screen_data()
-                
+
                 # Get resolution from scrcpy
                 width, height = self.scrcpy_client.get_resolution()
                 if width == 0 or height == 0:
                     width, height = ui_data.width, ui_data.height
-                
+
                 return ScreenDataResponse(
                     base64=screenshot_base64,
                     elements=ui_data.elements,
