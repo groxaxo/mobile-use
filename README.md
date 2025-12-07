@@ -35,6 +35,7 @@ Mobile-use is a powerful, open-source AI agent that controls your Android or IOS
 - 📱 **UI-Aware Automation**: Intelligently navigates through app interfaces (note: currently has limited effectiveness with games as they don't provide accessibility tree data).
 - 📊 **Data Scraping**: Extract information from any app and structure it into your desired format (e.g., JSON) using a natural language description.
 - 🔧 **Extensible & Customizable**: Easily configure different LLMs to power the agents that power mobile-use.
+- 📡 **Wireless Mirroring**: High-performance wireless screen mirroring with scrcpy for Android devices (see [Wireless Setup Guide](doc/WIRELESS_SETUP.md)).
 
 ## Benchmarks
 
@@ -81,7 +82,7 @@ Follow our [Platform quickstart](https://docs.minitap.ai/v2/platform-quickstart)
     1. Set `OPENAI_BASE_URL` and `OPENAI_API_KEY` in your `.env`
     2. In your `llm-config.override.jsonc`, set `openai` as the provider for the agent nodes you want, and choose a model supported by your provider.
 
-    > [!NOTE]  
+    > [!NOTE]
     > If you want to use Google Vertex AI, you must either:
     >
     > - Have credentials configured for your environment (gcloud, workload identity, etc…)
@@ -91,7 +92,7 @@ Follow our [Platform quickstart](https://docs.minitap.ai/v2/platform-quickstart)
 
 ### Quick Launch (Docker)
 
-> [!NOTE]  
+> [!NOTE]
 > This quickstart, is only available for Android devices/emulators as of now, and you must have Docker installed.
 
 First:
@@ -118,12 +119,12 @@ powershell.exe -ExecutionPolicy Bypass -File mobile-use.ps1 `
   --output-description "A JSON list of objects, each with 'sender' and 'subject' keys"
 ```
 
-> [!NOTE]  
+> [!NOTE]
 > If using your own device, make sure to accept the ADB-related connection requests that will pop up on your device.
 
 #### 🧰 Troubleshooting
 
-The script will try to connect to your device via IP.  
+The script will try to connect to your device via IP.
 Therefore, your device **must be connected to the same Wi-Fi network as your computer**.
 
 ##### 1. No device IP found
@@ -134,7 +135,7 @@ If the script fails with the following message:
 Could not get device IP. Is a device connected via USB and on the same Wi-Fi network?
 ```
 
-Then it couldn't find one of the common Wi-Fi interfaces on your device.  
+Then it couldn't find one of the common Wi-Fi interfaces on your device.
 Therefore, you must determine what WLAN interface your phone is using via `adb shell ip addr show up`.
 Then add the `--interface <YOUR_INTERFACE_NAME>` option to the script.
 
@@ -144,7 +145,7 @@ This is most probably an issue with your firewall blocking the connection. There
 
 ##### 3. Failed to pull GHCR docker images (unauthorized)
 
-Since UV docker images rely on a `ghcr.io` public repositories, you may have an expired token if you used `ghcr.io` before for private repositories.  
+Since UV docker images rely on a `ghcr.io` public repositories, you may have an expired token if you used `ghcr.io` before for private repositories.
 Try running `docker logout ghcr.io` and then run the script again.
 
 ### Manual Launch (Development Mode)
@@ -159,7 +160,7 @@ Mobile-use currently supports the following devices:
 - **Android Simulators**: Set up through Android Studio.
 - **iOS Simulators**: Supported for macOS users.
 
-> [!NOTE]  
+> [!NOTE]
 > Physical iOS devices are not yet supported.
 
 #### 2. Prerequisites
@@ -167,6 +168,22 @@ Mobile-use currently supports the following devices:
 **For Android:**
 
 - **[Android Debug Bridge (ADB)](https://developer.android.com/studio/releases/platform-tools)**: A tool to connect to your device.
+- **[scrcpy](https://github.com/Genymobile/scrcpy)** (Optional): For enhanced wireless screen mirroring performance.
+
+  scrcpy provides high-performance wireless screen mirroring for Android devices. To enable:
+
+  1. Install scrcpy:
+     - Linux: `apt-get install scrcpy` or download from [releases](https://github.com/Genymobile/scrcpy/releases)
+     - macOS: `brew install scrcpy`
+     - Windows: Download from [releases](https://github.com/Genymobile/scrcpy/releases)
+
+  2. Enable scrcpy in your `.env` file:
+     ```bash
+     USE_SCRCPY=true
+     ```
+
+  > [!NOTE]
+  > scrcpy is automatically included in Docker containers. For wireless operation, ensure your device is connected to the same Wi-Fi network.
 
 **For iOS (macOS only):**
 
@@ -237,7 +254,7 @@ python ./src/mobile_use/main.py \
   --output-description "A JSON list of objects, each with 'sender' and 'subject' keys"
 ```
 
-> [!NOTE]  
+> [!NOTE]
 > If you haven't configured a specific model, mobile-use will prompt you to choose one from the available options.
 
 ## 🔎 Agentic System Overview

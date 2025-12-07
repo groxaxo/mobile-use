@@ -31,9 +31,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # =================
 FROM debian:bookworm-slim
 
-# Install required dependencies for UV & adb
+# Install required dependencies for UV, adb, and scrcpy
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates adb unzip wget && \
+    apt-get install -y --no-install-recommends curl ca-certificates adb unzip wget \
+    scrcpy ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install JRE

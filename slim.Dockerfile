@@ -31,9 +31,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # =================
 FROM debian:bookworm-slim
 
-# Install required dependencies for mobile-use
+# Install required dependencies for mobile-use including scrcpy
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl adb && \
+    apt-get install -y --no-install-recommends curl adb \
+    scrcpy ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Use non-root user

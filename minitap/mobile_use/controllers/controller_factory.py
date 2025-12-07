@@ -1,3 +1,4 @@
+from minitap.mobile_use.config import settings
 from minitap.mobile_use.context import DevicePlatform, MobileUseContext
 from minitap.mobile_use.controllers.android_controller import AndroidDeviceController
 from minitap.mobile_use.controllers.device_controller import MobileDeviceController
@@ -17,13 +18,21 @@ def create_device_controller(ctx: MobileUseContext) -> MobileDeviceController:
         if ctx.ui_adb_client is None:
             raise ValueError("UIAutomator client not initialized for Android device")
 
-        logger.info(f"Creating Android controller for device {ctx.device.device_id}")
+        use_scrcpy = settings.USE_SCRCPY
+        logger.info(
+            f"Creating Android controller for device {ctx.device.device_id} "
+            f"(scrcpy: {'enabled' if use_scrcpy else 'disabled'})"
+        )
         return AndroidDeviceController(
             device_id=ctx.device.device_id,
             adb_client=ctx.adb_client,
             ui_adb_client=ctx.ui_adb_client,
             device_width=ctx.device.device_width,
             device_height=ctx.device.device_height,
+            use_scrcpy=use_scrcpy,
+            scrcpy_max_width=settings.SCRCPY_MAX_WIDTH,
+            scrcpy_bitrate=settings.SCRCPY_BITRATE,
+            scrcpy_max_fps=settings.SCRCPY_MAX_FPS,
         )
 
     elif platform == DevicePlatform.IOS:
