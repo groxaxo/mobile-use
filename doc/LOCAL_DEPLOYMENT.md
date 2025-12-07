@@ -105,12 +105,12 @@ cp llm-config.override.template.jsonc llm-config.override.jsonc
 nano llm-config.override.jsonc
 ```
 
-For local LLM, update the config:
+For local LLM, update the config (this is JSONC format - JSON with Comments):
 ```jsonc
 {
   "planning": {
     "provider": "openai",
-    "model": "llama3.1"  // Your local model
+    "model": "llama3.1"  // Your local model name
   },
   "coordination": {
     "provider": "openai",
@@ -167,17 +167,23 @@ docker-compose -f docker-compose.local-server.yml logs -f mobile-use
 docker-compose -f docker-compose.local-server.yml down
 ```
 
-**For USB connection (standard):**
+**For USB connection (using standard docker-compose.yml):**
 ```bash
+# Note: This uses the standard docker-compose.yml file
 docker-compose run --rm mobile-use-full-usb \
+  "Check my email and summarize any important messages"
+  
+# Or with docker-compose.local-server.yml:
+docker-compose -f docker-compose.local-server.yml --profile usb run --rm mobile-use-usb \
   "Check my email and summarize any important messages"
 ```
 
-**For wireless/IP connection (standard):**
+**For wireless/IP connection (using standard docker-compose.yml):**
 ```bash
 # Set device IP in environment
 export ADB_CONNECT_ADDR="192.168.1.100:5555"
 
+# Note: This uses the standard docker-compose.yml file
 docker-compose run --rm mobile-use-full-ip \
   "Check my email and summarize any important messages"
 ```
@@ -459,13 +465,14 @@ docker-compose logs -f mobile-use
    # Edit crontab
    crontab -e
    
-   # Run daily at 9 AM
-   0 9 * * * cd /home/user/mobile-use && docker-compose run --rm mobile-use-ip "Check my calendar"
+   # Run daily at 9 AM (using local server docker-compose)
+   0 9 * * * cd /home/user/mobile-use && docker-compose -f docker-compose.local-server.yml run --rm mobile-use "Check my calendar"
    ```
 
 2. **Create shell aliases:**
    ```bash
-   alias mobile-use='docker-compose run --rm mobile-use-ip'
+   # For local server deployment
+   alias mobile-use='docker-compose -f docker-compose.local-server.yml run --rm mobile-use'
    
    # Now you can just run:
    mobile-use "Your command"
@@ -473,7 +480,7 @@ docker-compose logs -f mobile-use
 
 3. **Batch multiple commands:**
    ```bash
-   docker-compose run --rm mobile-use-ip "
+   docker-compose -f docker-compose.local-server.yml run --rm mobile-use "
      First check my email, 
      then check my calendar for today,
      then tell me the weather
@@ -482,7 +489,7 @@ docker-compose logs -f mobile-use
 
 4. **Save outputs to files:**
    ```bash
-   docker-compose run --rm mobile-use-ip \
+   docker-compose -f docker-compose.local-server.yml run --rm mobile-use \
      "List all my photos from last month" \
      --output-description "JSON array of photo filenames with dates" \
      > photos.json

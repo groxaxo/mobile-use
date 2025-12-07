@@ -19,6 +19,8 @@ services:
     restart: unless-stopped  # Auto-restart on failure, but not after manual stop
     
     # Run as non-root user for security
+    # Note: The 'mobile-use' user is pre-configured in the Docker image
+    # If you encounter permission issues, you can override with: user: "${UID:-1000}:${GID:-1000}"
     user: "mobile-use:mobile-use"
     
     # Environment configuration
@@ -44,8 +46,10 @@ services:
       # ADB keys (persists device authorization)
       - mobile-use-adb-keys:/home/mobile-use/.android
       
-      # Custom LLM configuration
-      - ./llm-config.override.jsonc:/app/llm-config.override.jsonc:ro
+      # Custom LLM configuration (optional - only mount if file exists)
+      # Create with: cp llm-config.override.template.jsonc llm-config.override.jsonc
+      # Then uncomment the line below:
+      # - ./llm-config.override.jsonc:/app/llm-config.override.jsonc:ro
       
       # Logs and outputs (optional - uncomment to persist)
       # - ./logs:/home/mobile-use/logs
@@ -105,7 +109,8 @@ services:
     
     volumes:
       - mobile-use-adb-keys:/home/mobile-use/.android
-      - ./llm-config.override.jsonc:/app/llm-config.override.jsonc:ro
+      # Custom LLM configuration (optional)
+      # - ./llm-config.override.jsonc:/app/llm-config.override.jsonc:ro
     
     networks:
       - mobile-use-network
@@ -126,6 +131,8 @@ services:
         max-file: "3"
     
     # By default, don't start this service (use mobile-use instead)
+    # To use USB connection, add --profile usb to your docker-compose command
+    # Example: docker-compose -f docker-compose.local-server.yml --profile usb run mobile-use-usb "command"
     profiles:
       - usb
 
@@ -191,7 +198,7 @@ volumes:
 #    docker-compose -f docker-compose.local-server.yml run --rm mobile-use "Check my email"
 #
 # 2. Start with USB connection:
-#    docker-compose -f docker-compose.local-server.yml run --rm mobile-use-usb "Check my email"
+#    docker-compose -f docker-compose.local-server.yml --profile usb run --rm mobile-use-usb "Check my email"
 #
 # 3. Run as persistent service:
 #    docker-compose -f docker-compose.local-server.yml up -d mobile-use
@@ -206,6 +213,7 @@ volumes:
 #    docker-compose -f docker-compose.local-server.yml up -d ollama
 #    # Wait for startup, then pull a model:
 #    docker exec ollama ollama pull llama3.1
-#    # Configure .env:
+#    # Configure .env (use service name when services are in same network):
 #    # OPENAI_BASE_URL=http://ollama:11434/v1
 #    # OPENAI_API_KEY=ollama
+#    # Note: If Ollama is running on host machine, use http://host.docker.internal:11434/v1
