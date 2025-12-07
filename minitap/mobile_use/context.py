@@ -56,6 +56,7 @@ class ExecutionSetup(BaseModel):
 
     traces_path: Path | None = None
     trace_name: str | None = None
+    # Remote tracing is disabled by default - no telemetry is sent unless explicitly enabled
     enable_remote_tracing: bool = False
     app_lock_status: AppLaunchResult | None = None
 

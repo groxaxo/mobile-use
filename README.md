@@ -54,19 +54,19 @@ The official leaderboard is available [here](https://docs.google.com/spreadsheet
 
 Ready to automate your mobile experience? Follow these steps to get mobile-use up and running.
 
-### 🌐 From our Platform
+> [!NOTE]
+> **Mobile-use runs locally by default** and does not send any telemetry data. You have full control over your data and can choose to use any LLM provider (OpenAI, Google, local models, etc.) or optionally connect to the Minitap platform.
 
-Easiest way to get started is to use our Platform.
-Follow our [Platform quickstart](https://docs.minitap.ai/v2/platform-quickstart) to get started.
-
-### 🛠️ From source
+### 🛠️ Local Setup (Recommended)
 
 1.  **Set up Environment Variables:**
-    Copy the example `.env.example` file to `.env` and add your API keys.
+    Copy the example `.env.example` file to `.env` and add your API key for your preferred LLM provider.
 
     ```bash
     cp .env.example .env
     ```
+
+    **Required:** Set at least one LLM provider API key (e.g., `OPENAI_API_KEY`). The `MINITAP_API_KEY` is **optional** and only needed if you want to use the Minitap platform or minitap LLM provider.
 
 2.  **(Optional) Customize LLM Configuration:**
     To use different models or providers, create your own LLM configuration file.
@@ -89,6 +89,15 @@ Follow our [Platform quickstart](https://docs.minitap.ai/v2/platform-quickstart)
     > - Store the path to a service account JSON file as the GOOGLE_APPLICATION_CREDENTIALS environment variable
     >
     > More information: - [Credential types](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) - [google.auth API reference](https://googleapis.dev/python/google-auth/latest/reference/google.auth.html#module-google.auth)
+
+### 🌐 Using the Minitap Platform (Optional)
+
+If you prefer a managed solution, you can connect to the Minitap platform which provides:
+- Hosted LLM access
+- Task management and tracking
+- Remote execution on cloud devices
+
+Follow our [Platform quickstart](https://docs.minitap.ai/v2/platform-quickstart) to get started with the platform.
 
 ### Quick Launch (Docker)
 
