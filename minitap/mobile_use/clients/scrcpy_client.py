@@ -1,7 +1,7 @@
 """
 Scrcpy client wrapper for wireless screen mirroring and control.
 
-This module provides a wrapper around the py-scrcpy-client library to enable
+This module provides a wrapper around the scrcpy-client library to enable
 high-performance wireless screen mirroring for Android devices.
 """
 
