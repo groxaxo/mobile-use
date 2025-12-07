@@ -167,6 +167,22 @@ Mobile-use currently supports the following devices:
 **For Android:**
 
 - **[Android Debug Bridge (ADB)](https://developer.android.com/studio/releases/platform-tools)**: A tool to connect to your device.
+- **[scrcpy](https://github.com/Genymobile/scrcpy)** (Optional): For enhanced wireless screen mirroring performance.
+  
+  scrcpy provides high-performance wireless screen mirroring for Android devices. To enable:
+  
+  1. Install scrcpy: 
+     - Linux: `apt-get install scrcpy` or download from [releases](https://github.com/Genymobile/scrcpy/releases)
+     - macOS: `brew install scrcpy`
+     - Windows: Download from [releases](https://github.com/Genymobile/scrcpy/releases)
+  
+  2. Enable scrcpy in your `.env` file:
+     ```bash
+     USE_SCRCPY=true
+     ```
+
+  > [!NOTE]
+  > scrcpy is automatically included in Docker containers. For wireless operation, ensure your device is connected to the same Wi-Fi network.
 
 **For iOS (macOS only):**
 

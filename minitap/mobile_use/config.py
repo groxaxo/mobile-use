@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     ADB_HOST: str | None = None
     ADB_PORT: int | None = None
 
+    # Scrcpy wireless mirroring support
+    USE_SCRCPY: bool = False
+    SCRCPY_MAX_WIDTH: int = 0
+    SCRCPY_BITRATE: int = 8000000
+    SCRCPY_MAX_FPS: int = 60
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
 

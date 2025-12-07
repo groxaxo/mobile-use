@@ -1,6 +1,7 @@
 import base64
 import re
 from io import BytesIO
+from typing import Optional
 
 from adbutils import AdbClient, AdbDevice
 from PIL import Image
@@ -15,6 +16,15 @@ from minitap.mobile_use.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Try to import scrcpy client, but make it optional
+try:
+    from minitap.mobile_use.clients.scrcpy_client import ScrcpyClientWrapper
+    SCRCPY_AVAILABLE = True
+except ImportError:
+    SCRCPY_AVAILABLE = False
+    ScrcpyClientWrapper = None  # type: ignore
+    logger.debug("Scrcpy client not available")
+
 
 class AndroidDeviceController(MobileDeviceController):
     def __init__(
@@ -24,6 +34,10 @@ class AndroidDeviceController(MobileDeviceController):
         ui_adb_client: UIAutomatorClient,
         device_width: int,
         device_height: int,
+        use_scrcpy: bool = False,
+        scrcpy_max_width: int = 0,
+        scrcpy_bitrate: int = 8000000,
+        scrcpy_max_fps: int = 60,
     ):
         self.device_id = device_id
         self.adb_client = adb_client
@@ -31,6 +45,34 @@ class AndroidDeviceController(MobileDeviceController):
         self.device_width = device_width
         self.device_height = device_height
         self._device: AdbDevice | None = None
+        
+        # Scrcpy support
+        self.use_scrcpy = use_scrcpy and SCRCPY_AVAILABLE
+        self.scrcpy_client: Optional[ScrcpyClientWrapper] = None
+        
+        if self.use_scrcpy:
+            if not SCRCPY_AVAILABLE:
+                logger.warning("Scrcpy requested but not available, falling back to UIAutomator2")
+                self.use_scrcpy = False
+            else:
+                logger.info("Initializing scrcpy client for wireless screen mirroring")
+                try:
+                    self.scrcpy_client = ScrcpyClientWrapper(
+                        device=self.device,
+                        max_width=scrcpy_max_width,
+                        bitrate=scrcpy_bitrate,
+                        max_fps=scrcpy_max_fps,
+                    )
+                    if self.scrcpy_client.start():
+                        logger.success("Scrcpy client started successfully")
+                    else:
+                        logger.warning("Failed to start scrcpy client, falling back to UIAutomator2")
+                        self.use_scrcpy = False
+                        self.scrcpy_client = None
+                except Exception as e:
+                    logger.error(f"Error initializing scrcpy: {e}, falling back to UIAutomator2")
+                    self.use_scrcpy = False
+                    self.scrcpy_client = None
 
     @property
     def device(self) -> AdbDevice:
@@ -71,24 +113,49 @@ class AndroidDeviceController(MobileDeviceController):
             return f"ADB swipe failed: {str(e)}"
 
     async def get_screen_data(self) -> ScreenDataResponse:
-        """Get screen data using the UIAutomator2 client"""
+        """Get screen data using scrcpy (if enabled) or UIAutomator2 client"""
         try:
-            logger.info("Using UIAutomator2 for screen data retrieval")
-            ui_data = self.ui_adb_client.get_screen_data()
-            return ScreenDataResponse(
-                base64=ui_data.base64,
-                elements=ui_data.elements,
-                width=ui_data.width,
-                height=ui_data.height,
-                platform="android",
-            )
+            if self.use_scrcpy and self.scrcpy_client:
+                logger.info("Using scrcpy for screen data retrieval")
+                # Get screenshot from scrcpy
+                screenshot_base64 = self.scrcpy_client.get_screenshot_base64()
+                
+                # Get UI hierarchy from UIAutomator2 (scrcpy doesn't provide this)
+                ui_data = self.ui_adb_client.get_screen_data()
+                
+                # Get resolution from scrcpy
+                width, height = self.scrcpy_client.get_resolution()
+                if width == 0 or height == 0:
+                    width, height = ui_data.width, ui_data.height
+                
+                return ScreenDataResponse(
+                    base64=screenshot_base64,
+                    elements=ui_data.elements,
+                    width=width,
+                    height=height,
+                    platform="android",
+                )
+            else:
+                logger.info("Using UIAutomator2 for screen data retrieval")
+                ui_data = self.ui_adb_client.get_screen_data()
+                return ScreenDataResponse(
+                    base64=ui_data.base64,
+                    elements=ui_data.elements,
+                    width=ui_data.width,
+                    height=ui_data.height,
+                    platform="android",
+                )
         except Exception as e:
             logger.error(f"Failed to get screen data: {e}")
             raise
 
     async def screenshot(self) -> str:
         try:
-            return (await self.get_screen_data()).base64
+            if self.use_scrcpy and self.scrcpy_client:
+                logger.info("Taking screenshot via scrcpy")
+                return self.scrcpy_client.get_screenshot_base64()
+            else:
+                return (await self.get_screen_data()).base64
         except Exception as e:
             logger.error(f"Failed to take screenshot: {e}")
             raise
@@ -260,7 +327,11 @@ class AndroidDeviceController(MobileDeviceController):
             return False
 
     async def cleanup(self) -> None:
-        pass
+        """Clean up resources including scrcpy client if active."""
+        if self.scrcpy_client:
+            logger.info("Stopping scrcpy client")
+            self.scrcpy_client.stop()
+            self.scrcpy_client = None
 
     def get_compressed_b64_screenshot(self, image_base64: str, quality: int = 50) -> str:
         if image_base64.startswith("data:image"):
